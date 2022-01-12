@@ -17,6 +17,8 @@ class Player(AbstractPlayer):
         self.rival_pos = None
 
     def set_game_params(self, board):
+
+        print("Ok")
         """Set the game parameters needed for this player.
         This function is called before the game starts.
         (See GameWrapper.py for more info where it is called)
