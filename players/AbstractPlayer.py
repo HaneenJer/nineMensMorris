@@ -131,8 +131,6 @@ class AbstractPlayer:
 
         return mill_number
 
-
-
     def number_of_morris(self, board):
         """this function calculates the diffirance in mill for both players """
         # TODO calculate the player morris
@@ -167,9 +165,9 @@ class AbstractPlayer:
         pass
 
     def closed_morris(self, board, player, curr_player_pos, moved_soldier):
-        """ :parameters board - the current board
-        curr_player_pos - 0-8 np array with soldiers positions
-        moved_soldier - the idx of the soldier moved in the last round
+        """ :param board - the current board
+        :param curr_player_pos - 0-8 np array with soldiers positions
+        :param moved_soldier - the idx of the soldier moved in the last round
         :return 1 if the player closed a mill with his last move,
         -1 if the rival closed a mill
         0 otherwise"""
@@ -184,9 +182,40 @@ class AbstractPlayer:
                 return -1
         return 0
 
+    def get_number_of_blocked_pieces(self, board, soldier_pos):
+        """ :param board - the current board
+        :param soldier_pos - players positions on board
+        :return the number of blocked soldiers """
+        blocked_pieces = 0
+        for index, position in np.ndenumerate(soldier_pos):
+            if position > 0:
+                directions = utils.get_directions(position)
+
+                "if one direction is open, the soldier is not blocked"
+                for direction in directions:
+                    if board[direction] == 0:
+                        break
+
+                "no direction is open, soldier is blocked"
+                blocked_pieces += 1
+        return blocked_pieces
+
+    def number_of_blocked_rival_pieces(self, board, soldier_pos, rival_soldiers_pos):
+        """ :param board - the current board
+        :param soldier_pos - players positions on board
+        :param rival_soldiers_pos - rival players positions on board
+        :return the difference between the number of rival's blocked pieces and
+        my blocked pieces """
+        my_blocked_pieces = self.get_number_of_blocked_pieces(board, soldier_pos)
+        rival_blocked_pieces = self.get_number_of_blocked_pieces(board, rival_soldiers_pos)
+        diff = my_blocked_pieces - rival_blocked_pieces
+        return diff
+
     def phase1_heuristic(self, board, player, soldiers_pos, rival_soldiers_pos, moved_soldier):
-        """:parameters board: the current game board
-        player: boolean value, if player is equal to 1 - the current player is playing
+        """:param board - the current game board
+        :param soldiers_pos - players positions on board
+        :param rival_soldiers_pos - rival players positions on board
+        :param player - boolean value, if player is equal to 1 - the current player is playing
         if player is 0 - the rival is playing
         :return heuristics value for phase 1"""
         closed_mill = self.closed_morris(board, player, soldiers_pos, moved_soldier)
