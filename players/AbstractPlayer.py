@@ -2,7 +2,9 @@
 Your players classes must inherit from this.
 """
 import utils
-import  numpy as np
+import numpy as np
+
+
 class AbstractPlayer:
     """Your player must inherit from this class.
     Your player class name must be 'Player', as in the given examples (SimplePlayer, LivePlayer).
@@ -10,6 +12,7 @@ class AbstractPlayer:
     from players.AbstractPlayer import AbstractPlayer
     class Player(AbstractPlayer):
     """
+
     def __init__(self, game_time):
         """
         Player initialization.
@@ -118,50 +121,47 @@ class AbstractPlayer:
         else:
             return False
 
-    #TODO change name
-    def calculateMorris(self, board, player):
+    def calculate_morris(self, board, player):
         """calculate the number of morris to the player in the current board"""
         mill_number = 0
         for index, x in enumerate(board):
             if x == player:
                 if self.is_mill(index):
-                    mill_number+=1/3
+                    mill_number += 1 / 3
 
         return mill_number
 
+    def number_of_morris(self, board):
+        """this function calculates the diffirance in mill for both players """
+        # TODO calculate the player morris
 
+        return self.calculate_morris(self, board, 1) - self.calculate_morris(self, board, 2)
 
-    """this function calculates the diffirance in mill for both players """
-    def numberOfMorrisFunction(self, board):
-        #TODO calculate the player morris
-
-        return self.calculateMorris(self, board, 1) - self.calculateMorris(self, board, 2)
 
     def winningConfFunction(self, player, board=None):
-
         if board is None:
             board = self.board
 
         so_number = 0
         for i in board:
-            if(i == player):
+            if i == player:
                 so_number += 1
 
         if so_number <= 2:
-             return True
-        #TODO check if blocks
+            return True
+        # TODO check if blocks
 
 
-
-    def numberOfPieces(self,player,board=None):
+    def number_of_pieces(self, player, board=None):
         if board is None:
             board = self.board
         so_number = 0
         for i in board:
-            if (i == player):
+            if i == player:
                 so_number += 1
 
         return so_number
+
     def doubleMorriesFunctionAux(self,board,player,position):
         if board is None:
             board = self.board
@@ -208,5 +208,81 @@ class AbstractPlayer:
             return True
 
     def succ(self , board):
+        pass
 
+
+    def closed_morris(self, board, player, curr_player_pos, moved_soldier):
+        """ :param board - the current board
+        :param curr_player_pos - 0-8 np array with soldiers positions
+        :param moved_soldier - the idx of the soldier moved in the last round
+        :return 1 if the player closed a mill with his last move,
+        -1 if the rival closed a mill
+        0 otherwise"""
+        if board is None:
+            board = self.board
+        position = curr_player_pos[moved_soldier]
+        "check if the moved soldier created a mill"
+        if self.is_mill(position, board):
+            if player == 1:
+                return 1
+            else:
+                return -1
+        return 0
+
+    def get_number_of_blocked_pieces(self, board, soldier_pos):
+        """ :param board - the current board
+        :param soldier_pos - players positions on board
+        :return the number of blocked soldiers """
+        blocked_pieces = 0
+        for index, position in np.ndenumerate(soldier_pos):
+            if position > 0:
+                directions = utils.get_directions(position)
+
+                "if one direction is open, the soldier is not blocked"
+                for direction in directions:
+                    if board[direction] == 0:
+                        break
+
+                "no direction is open, soldier is blocked"
+                blocked_pieces += 1
+        return blocked_pieces
+
+    def number_of_blocked_rival_pieces(self, board, soldier_pos, rival_soldiers_pos):
+        """ :param board - the current board
+        :param soldier_pos - players positions on board
+        :param rival_soldiers_pos - rival players positions on board
+        :return the difference between the number of rival's blocked pieces and
+        my blocked pieces """
+        my_blocked_pieces = self.get_number_of_blocked_pieces(board, soldier_pos)
+        rival_blocked_pieces = self.get_number_of_blocked_pieces(board, rival_soldiers_pos)
+        diff = my_blocked_pieces - rival_blocked_pieces
+        return diff
+
+    def get_number_of_2_pieces_per_player(self, board, player):
+        """:param board - the current game board
+        :param player - 1/2
+        :return number of two piece configuration for a given player"""
+        num_2_pieces = 0
+        for position in range(0, 23):
+            num_2_pieces += self.check_next_mill(position, player, board)
+        return num_2_pieces
+
+    def number_of_2_pieces_conf(self, board):
+        """:param board - the current game board
+        :return the difference between the number of my two piece configurations and
+        my rival's two piece configurations"""
+        my_2_pieces = self.get_number_of_2_pieces_per_player(board, 1)
+        rival_2_pieces = self.get_number_of_2_pieces_per_player(board, 2)
+        diff = my_2_pieces - rival_2_pieces
+        return diff
+
+    def phase1_heuristic(self, board, player, soldiers_pos, rival_soldiers_pos, moved_soldier):
+        """:param board - the current game board
+        :param soldiers_pos - players positions on board
+        :param rival_soldiers_pos - rival players positions on board
+        :param player - 1/2
+        :return heuristics value for phase 1"""
+        closed_mill = self.closed_morris(board, player, soldiers_pos, moved_soldier)
+        value = closed_mill
+        return value
         pass
