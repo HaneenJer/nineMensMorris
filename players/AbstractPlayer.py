@@ -121,14 +121,17 @@ class AbstractPlayer:
     #TODO change name
     def calculateMorris(self, board, player):
         """calculate the number of morris to the player in the current board"""
-        testArray = np.array(24);
-        numberOfMills = 0
-        morrisarray ={}
-        for i in board:
-            if board[i] == player :
-                pass
+        mill_number = 0
+        for index, x in enumerate(board):
+            if x == player:
+                if self.is_mill(index):
+                    mill_number+=1/3
+
+        return mill_number
 
 
+
+    """this function calculates the diffirance in mill for both players """
     def numberOfMorrisFunction(self, board):
         #TODO calculate the player morris
 
@@ -159,3 +162,5 @@ class AbstractPlayer:
                 so_number += 1
 
         return so_number
+    def doubleMorriesFunction(self,board,player):
+        pass
