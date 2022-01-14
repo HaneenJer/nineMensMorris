@@ -117,3 +117,45 @@ class AbstractPlayer:
             return self.check_next_mill(position, p, board)
         else:
             return False
+
+    #TODO change name
+    def calculateMorris(self, board, player):
+        """calculate the number of morris to the player in the current board"""
+        testArray = np.array(24);
+        numberOfMills = 0
+        morrisarray ={}
+        for i in board:
+            if board[i] == player :
+                pass
+
+
+    def numberOfMorrisFunction(self, board):
+        #TODO calculate the player morris
+
+        return self.calculateMorris(self, board, 1) - self.calculateMorris(self, board, 2)
+
+    def winningConfFunction(self, player, board=None):
+
+        if board == None:
+            board = self.board
+
+        so_number = 0
+        for i in board:
+            if(i == player):
+                so_number += 1
+
+        if so_number <= 2:
+             return True
+        #TODO check if blocks
+
+
+
+    def numberOfPieces(self,player,board=None):
+        if board == None:
+            board = self.board
+        so_number = 0
+        for i in board:
+            if (i == player):
+                so_number += 1
+
+        return so_number
