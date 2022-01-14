@@ -2,7 +2,9 @@
 Your players classes must inherit from this.
 """
 import utils
-import  numpy as np
+import numpy as np
+
+
 class AbstractPlayer:
     """Your player must inherit from this class.
     Your player class name must be 'Player', as in the given examples (SimplePlayer, LivePlayer).
@@ -10,6 +12,7 @@ class AbstractPlayer:
     from players.AbstractPlayer import AbstractPlayer
     class Player(AbstractPlayer):
     """
+
     def __init__(self, game_time):
         """
         Player initialization.
@@ -118,49 +121,75 @@ class AbstractPlayer:
         else:
             return False
 
-    #TODO change name
-    def calculateMorris(self, board, player):
+    def calculate_morris(self, board, player):
         """calculate the number of morris to the player in the current board"""
         mill_number = 0
         for index, x in enumerate(board):
             if x == player:
                 if self.is_mill(index):
-                    mill_number+=1/3
+                    mill_number += 1 / 3
 
         return mill_number
 
 
 
-    """this function calculates the diffirance in mill for both players """
-    def numberOfMorrisFunction(self, board):
-        #TODO calculate the player morris
+    def number_of_morris(self, board):
+        """this function calculates the diffirance in mill for both players """
+        # TODO calculate the player morris
 
-        return self.calculateMorris(self, board, 1) - self.calculateMorris(self, board, 2)
+        return self.calculate_morris(self, board, 1) - self.calculate_morris(self, board, 2)
 
-    def winningConfFunction(self, player, board=None):
+    def winning_conf(self, player, board=None):
 
-        if board == None:
+        if board is None:
             board = self.board
 
         so_number = 0
         for i in board:
-            if(i == player):
+            if i == player:
                 so_number += 1
 
         if so_number <= 2:
-             return True
-        #TODO check if blocks
+            return True
+        # TODO check if blocks
 
-
-
-    def numberOfPieces(self,player,board=None):
-        if board == None:
+    def number_of_pieces(self, player, board=None):
+        if board is None:
             board = self.board
         so_number = 0
         for i in board:
-            if (i == player):
+            if i == player:
                 so_number += 1
 
         return so_number
-    def doubleMorriesFunction(self,board,player):
+
+    def double_morris(self, board, player):
+        pass
+
+    def closed_morris(self, board, player, curr_player_pos, moved_soldier):
+        """ :parameters board - the current board
+        curr_player_pos - 0-8 np array with soldiers positions
+        moved_soldier - the idx of the soldier moved in the last round
+        :return 1 if the player closed a mill with his last move,
+        -1 if the rival closed a mill
+        0 otherwise"""
+        if board is None:
+            board = self.board
+        position = curr_player_pos[moved_soldier]
+        "check if the moved soldier created a mill"
+        if self.is_mill(position, board):
+            if player == 1:
+                return 1
+            else:
+                return -1
+        return 0
+
+    def phase1_heuristic(self, board, player, soldiers_pos, rival_soldiers_pos, moved_soldier):
+        """:parameters board: the current game board
+        player: boolean value, if player is equal to 1 - the current player is playing
+        if player is 0 - the rival is playing
+        :return heuristics value for phase 1"""
+        closed_mill = self.closed_morris(board, player, soldiers_pos, moved_soldier)
+        value = closed_mill
+        return value
         pass
