@@ -137,8 +137,8 @@ class AbstractPlayer:
 
         return self.calculate_morris(self, board, 1) - self.calculate_morris(self, board, 2)
 
-    def winning_conf(self, player, board=None):
 
+    def winningConfFunction(self, player, board=None):
         if board is None:
             board = self.board
 
@@ -151,6 +151,7 @@ class AbstractPlayer:
             return True
         # TODO check if blocks
 
+
     def number_of_pieces(self, player, board=None):
         if board is None:
             board = self.board
@@ -161,8 +162,54 @@ class AbstractPlayer:
 
         return so_number
 
-    def double_morris(self, board, player):
+    def doubleMorriesFunctionAux(self,board,player,position):
+        if board is None:
+            board = self.board
+        mill = [
+            (self.is_player(player, 1, 2, board) and self.is_player(player, 3, 5, board)),
+            (self.is_player(player, 0, 2, board) and self.is_player(player, 9, 17, board)),
+            (self.is_player(player, 0, 1, board) and self.is_player(player, 4, 7, board)),
+            (self.is_player(player, 0, 5, board) and self.is_player(player, 11, 19, board)),
+            (self.is_player(player, 2, 7, board) and self.is_player(player, 12, 20, board)),
+            (self.is_player(player, 0, 3, board) and self.is_player(player, 6, 7, board)),
+            (self.is_player(player, 5, 7, board) and self.is_player(player, 14, 22, board)),
+            (self.is_player(player, 2, 4, board) and self.is_player(player, 5, 6, board)),
+            (self.is_player(player, 9, 10, board) and self.is_player(player, 11, 13, board)),
+            (self.is_player(player, 8, 10, board) and self.is_player(player, 1, 17, board)),
+            (self.is_player(player, 8, 9, board) and self.is_player(player, 12, 15, board)),
+            (self.is_player(player, 3, 19, board) and self.is_player(player, 8, 13, board)),
+            (self.is_player(player, 20, 4, board) and self.is_player(player, 10, 15, board)),
+            (self.is_player(player, 8, 11, board) and self.is_player(player, 14, 15, board)),
+            (self.is_player(player, 13, 15, board) and self.is_player(player, 6, 22, board)),
+            (self.is_player(player, 13, 14, board) and self.is_player(player, 10, 12, board)),
+            (self.is_player(player, 17, 18, board) and self.is_player(player, 19, 21, board)),
+            (self.is_player(player, 1, 9, board) and self.is_player(player, 16, 18, board)),
+            (self.is_player(player, 16, 17, board) and self.is_player(player, 20, 23, board)),
+            (self.is_player(player, 16, 21, board) and self.is_player(player, 3, 11, board)),
+            (self.is_player(player, 12, 4, board) and self.is_player(player, 18, 23, board)),
+            (self.is_player(player, 16, 19, board) and self.is_player(player, 22, 23, board)),
+            (self.is_player(player, 6, 14, board) and self.is_player(player, 21, 23, board)),
+            (self.is_player(player, 18, 20, board) and self.is_player(player, 21, 22, board))
+        ]
+
+        return mill[position]
+
+    def doubleMorriesFunction(self, board, player):
+        double_number = 0
+        for index, x in enumerate(board):
+            if x == player:
+                if self.doubleMorriesFunctionAux(board,player,index):
+                    double_number += 1  #TODO Check if needed to change
+        return double_number
+    #TODO check what player we need to put in or both players .
+
+    def isGoal(self, board):
+        if self.winningConfFunction(self , 1, board):
+            return True
+
+    def succ(self , board):
         pass
+
 
     def closed_morris(self, board, player, curr_player_pos, moved_soldier):
         """ :param board - the current board
