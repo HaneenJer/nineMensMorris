@@ -211,12 +211,29 @@ class AbstractPlayer:
         diff = my_blocked_pieces - rival_blocked_pieces
         return diff
 
+    def get_number_of_2_pieces_per_player(self, board, player):
+        """:param board - the current game board
+        :param player - 1/2
+        :return number of two piece configuration for a given player"""
+        num_2_pieces = 0
+        for position in range(0, 23):
+            num_2_pieces += self.check_next_mill(position, player, board)
+        return num_2_pieces
+
+    def number_of_2_pieces_conf(self, board):
+        """:param board - the current game board
+        :return the difference between the number of my two piece configurations and
+        my rival's two piece configurations"""
+        my_2_pieces = self.get_number_of_2_pieces_per_player(board, 1)
+        rival_2_pieces = self.get_number_of_2_pieces_per_player(board, 2)
+        diff = my_2_pieces - rival_2_pieces
+        return diff
+
     def phase1_heuristic(self, board, player, soldiers_pos, rival_soldiers_pos, moved_soldier):
         """:param board - the current game board
         :param soldiers_pos - players positions on board
         :param rival_soldiers_pos - rival players positions on board
-        :param player - boolean value, if player is equal to 1 - the current player is playing
-        if player is 0 - the rival is playing
+        :param player - 1/2
         :return heuristics value for phase 1"""
         closed_mill = self.closed_morris(board, player, soldiers_pos, moved_soldier)
         value = closed_mill
