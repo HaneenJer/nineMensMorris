@@ -20,6 +20,9 @@ class AbstractPlayer:
         self.game_time = game_time
         self.board = np.array(24)
         self.directions = utils.get_directions
+        self.turn = 0
+        self.my_pos = np.array(9,-1)
+        self.rival_pos = np.array(9,-1)
 
     def set_game_params(self, board):
         """Set the game parameters needed for this player.
@@ -62,6 +65,19 @@ class AbstractPlayer:
             return True
         else:
             return False
+    def choosePlayer(self):
+        """
+        this function check for a player that we didn't choose and return it
+        :return: a player to play with
+        """
+        for x in self.my_pos:
+            if self.my_pos[x] == -1 :
+                return self.my_pos[x]
+
+    def _choose_rival_cell_to_kill(self):
+        # TODO: choose cell heuristic
+        rival_cell = None
+        return rival_cell
 
     def check_next_mill(self, position, player, board=None):
         """
@@ -137,19 +153,21 @@ class AbstractPlayer:
 
         return self.calculate_morris(self, board, 1) - self.calculate_morris(self, board, 2)
 
+    #TODO check where we need to put his fucntion
+    def winningConfFunction(self):
+        live_soldier = 0
+        for index in self.rival_pos:
+            if index == -2:
+                live_soldier+=1
 
-    def winningConfFunction(self, player, board=None):
-        if board is None:
-            board = self.board
-
-        so_number = 0
-        for i in board:
-            if i == player:
-                so_number += 1
-
-        if so_number <= 2:
+        if live_soldier <= 2:
             return True
-        # TODO check if blocks
+
+        if self.get_number_of_blocked_pieces(self.rival_pos) == live_soldier:
+            return True
+
+        return False
+
 
 
     def number_of_pieces(self, player, board=None):
@@ -201,14 +219,7 @@ class AbstractPlayer:
                 if self.doubleMorriesFunctionAux(board,player,index):
                     double_number += 1  #TODO Check if needed to change
         return double_number
-    #TODO check what player we need to put in or both players .
 
-    def isGoal(self, board):
-        if self.winningConfFunction(self , 1, board):
-            return True
-
-    def succ(self , board):
-        pass
 
 
     def closed_morris(self, board, player, curr_player_pos, moved_soldier):
@@ -282,7 +293,70 @@ class AbstractPlayer:
         :param rival_soldiers_pos - rival players positions on board
         :param player - 1/2
         :return heuristics value for phase 1"""
+        number_of_pieces = self.number_of_pieces(self,1,board) - self.number_of_pieces(self,2,board)
+        doubleMorriesFunction = self.doubleMorriesFunction(self,board,1) - self.doubleMorriesFunction(self,board,2)
         closed_mill = self.closed_morris(board, player, soldiers_pos, moved_soldier)
-        value = closed_mill
+        blocked_diff = self.number_of_blocked_rival_pieces(self, board, soldiers_pos, rival_soldiers_pos)
+        value = closed_mill + number_of_pieces + doubleMorriesFunction + blocked_diff
+
         return value
-        pass
+
+
+
+
+    def isGoal(self, board = None):
+        if self.winningConfFunction(self):
+            return True
+        return False
+
+
+
+    def succ(self):
+        #TODO add deep copy
+        board = self.board
+        """
+        :param board: the current board that we want to get it succ
+        :param player: the player that playing
+        :return: all possiable possitions for the player to move.
+        """
+        #TODO we are in turn 1 we choose to pick position for the soldier .
+        #TODO we need to add player.
+        if self.turn < 18:
+            #TODO check what player you need to put in the board -
+            player_pos = self.choosePlayer(self)
+            for index , x in enumerate(board):
+                if board(index) == 0:
+                    if self.is_mill(self,board,index):
+                        #TODO check if needed to put in a or loop
+                        rival_kill = self._choose_rival_cell_to_kill(self)
+                        rival_idx = np.where(self.rival_pos == rival_kill)[0][0]
+                        self.rival_pos[rival_idx] = -2
+                        board[rival_kill] = 0 #TODO change to player
+                        yield board , index , player_pos
+                    else:
+                        self.my_pos[player_pos] = index
+                        yield board , index , player_pos
+
+        if self.turn >=18 :
+            for x in self.my_pos:
+                if x != -1:
+                    position_to_move = utils.get_directions(x)
+                for index_to_move in position_to_move:
+                    if self.board[index_to_move] == 0:
+                        if self.is_mill(self,index_to_move,board) :
+                            rival_kill = self._choose_rival_cell_to_kill(self)
+                            rival_idx = np.where(self.rival_pos == rival_kill)[0][0]
+                            self.rival_pos[rival_idx] = -2
+                            board[rival_kill]= 0
+                            yield board, index
+                        else:
+                             self.my_pos[player_pos] = index
+                             yield board, index , x
+
+
+
+
+
+
+
+

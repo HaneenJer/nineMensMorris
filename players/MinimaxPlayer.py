@@ -12,13 +12,10 @@ class Player(AbstractPlayer):
     def __init__(self, game_time):
         AbstractPlayer.__init__(self, game_time)  # keep the inheritance of the parent's (AbstractPlayer) __init__()
         # TODO: initialize more fields, if needed, and the AlphaBeta algorithm from SearchAlgos.py
-        self.turn = 0
-        self.my_pos = None
-        self.rival_pos = None
+
 
     def set_game_params(self, board):
 
-        print("Ok")
         """Set the game parameters needed for this player.
         This function is called before the game starts.
         (See GameWrapper.py for more info where it is called)
@@ -53,6 +50,7 @@ class Player(AbstractPlayer):
         No output is expected
         """
         # TODO: erase the following line and implement this function.
+        "same as simple player"
         raise NotImplementedError
 
     ########## helper functions in class ##########

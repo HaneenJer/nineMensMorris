@@ -35,6 +35,13 @@ class MiniMax(SearchAlgos):
         :param maximizing_player: Whether this is a max node (True) or a min node (False).
         :return: A tuple: (The min max algorithm value, The direction in case of max node or None in min mode)
         """
+
+        if self.goal(state) or depth == 0 :
+            return self.utility(state)
+
+        for state_pos in self.succ(state) :
+
+        #todo we need to return direction from the succ function
         #TODO: erase the following line and implement this function.
         raise NotImplementedError
 
